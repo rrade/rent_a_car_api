@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\CountryController;
+use App\Http\Controllers\API\LocationController;
 use App\Http\Controllers\API\PhotoController;
 use App\Http\Controllers\API\ReservationController;
 use App\Http\Controllers\API\UserController;
@@ -66,6 +68,11 @@ Route::group([
 
     //Photo
     Route::delete('photo-delete/{id}', [PhotoController::class,'destroy']);
+
+    //Country
+    Route::get('countries', [CountryController::class,'index']);
+    //Locations
+    Route::get('locations', [LocationController::class,'index']);
 });
 
 
