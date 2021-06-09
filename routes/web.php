@@ -6,6 +6,13 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\HomeController;
 
+Route::get('/storage-link-php', function () {
+    $target = '/home/dhubmeef/public_html/akademija-app/storage/app/public/';
+    $shortcut = '/home/dhubmeef/public_html/akademija-app/public/storage';
+    symlink($target, $shortcut);
+});
+
+
 Route::middleware(['auth'])->group(function () {
      Route::get('/', [ReservationController::class, 'index']);
      Route::get('/home', [HomeController::class, 'index'])->name('home');
@@ -16,7 +23,7 @@ Route::middleware(['auth'])->group(function () {
      Route::get('/vehicles/create-two', [VehicleController::class, 'createStepTwo'])->name('vehicles.create.two');
      Route::post('/vehicles/post-two', [VehicleController::class, 'postStepTwo']);
 
-     // vehicle edit 
+     // vehicle edit
      Route::get('/vehicles/{id}/edit-one', [VehicleController::class, 'editStepOne']);
      Route::post('/vehicles/{id}/post-edit-one', [VehicleController::class, 'postEditStepOne']);
      Route::get('/vehicles/edit-two', [VehicleController::class, 'editStepTwo'])->name('vehicles.edit.two');;
@@ -30,6 +37,8 @@ Route::middleware(['auth'])->group(function () {
      Route::resource('/clients', ClientController::class);
      Route::resource('/reservations', ReservationController::class);
 
-
-});     
+   // Auth::routes()->except(['login','register']);
+});
 Auth::routes();
+
+

@@ -15,7 +15,7 @@ class CreateVehiclesTable extends Migration
     {
         Schema::create('vehicles', function (Blueprint $table) {
             $table->id();
-            $table->string('plate_no')->unique();
+            $table->string('plate_no');
             $table->year('production_year');
             $table->foreignId('car_type_id')->constrained('car_types');
             $table->integer('no_of_seats');

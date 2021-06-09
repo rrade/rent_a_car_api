@@ -13,6 +13,8 @@ class Client extends Model
 
     protected $guarded = [];
 
+    protected $with = ['country'];
+
     public function country() {
         return $this->belongsTo(Country::class);
     }

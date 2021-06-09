@@ -11,9 +11,10 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
+            RoleSeeder::class,
             CarTypeSeeder::class,
             LocationSeeder::class,
-            EquipmentSeeder::class, 
+            EquipmentSeeder::class,
             VehicleSeeder::class,
             PhotoSeeder::class
         ]);
@@ -31,6 +32,6 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ReservationSeeder::class,
         ]);
-       
+
     }
 }

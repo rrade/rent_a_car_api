@@ -3,12 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\ClientRequest;
 use App\Http\Requests\UpdateClientRequest;
 use App\Models\Country;
 use App\Models\EquipmentReservation;
 use App\Models\Reservation;
+use Illuminate\Support\Facades\Hash;
 
 class ClientController extends Controller
 {
@@ -37,12 +41,25 @@ class ClientController extends Controller
             'identification_document_no' => $request->identification_document_no,
             'email' => $request->email,
             'phone_no' => $request->phone_no,
-            'date_of_first_reservation' => $request->date_of_first_reservation, 
+            'date_of_first_reservation' => $request->date_of_first_reservation,
             'date_of_last_reservation' => $request->date_of_last_reservation,
             'remarks' => $request->remarks
         ];
 
         $new_client = Client::query()->create($data);
+        //$client_id = Client::find($new_client->id)->first();
+        $dataset = [
+            'email' => $request->email,
+            'client_id' => $new_client->id,
+            'role_id' => Role::USER,
+            'name' => $full_name,
+            'password' => Hash::make('12345678'),
+        ];
+
+        //dd($dataset);
+
+        $user = User::query()->create($dataset);
+       // dd($user,$new_client->id);
         return redirect("/clients/$new_client->id");
     }
 
@@ -62,7 +79,7 @@ class ClientController extends Controller
 
     public function update(ClientRequest $request, Client $client)
     {
-        // unique rule used to make issues when updating clients 
+        // unique rule used to make issues when updating clients
         // this solves it by giving instructions to ignore the unique role for this same id
         $validated = $request->validate([
             'email'=> "required|email|unique:clients,email, $client->id",
@@ -70,7 +87,7 @@ class ClientController extends Controller
         ]);
 
         $client->update(
-            [ 
+            [
                 'name' => $request->full_name,
                 'country_id' => $request->country_id,
                 'identification_document_no' => $validated['identification_document_no'],
@@ -91,7 +108,7 @@ class ClientController extends Controller
 
         if ($reservations) {
             foreach ($reservations as $reservation) {
-                EquipmentReservation::where('reservation_id', $reservation->id)->delete(); 
+                EquipmentReservation::where('reservation_id', $reservation->id)->delete();
                 $reservation->delete();
             }
         }

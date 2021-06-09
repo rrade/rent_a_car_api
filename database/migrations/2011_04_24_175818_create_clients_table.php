@@ -12,11 +12,11 @@ class CreateClientsTable extends Migration
             $table->id();
             $table->string('name');
             $table->foreignId('country_id')->constrained('countries');
-            $table->integer('identification_document_no');
+            $table->string('identification_document_no');
             $table->string('email')->unique()->nullable();
             $table->string('phone_no');
-            $table->date('date_of_first_reservation');
-            $table->date('date_of_last_reservation');
+            $table->date('date_of_first_reservation')->nullable();
+            $table->date('date_of_last_reservation')->nullable();
             $table->text('remarks')->nullable();
             $table->timestamps();
         });
