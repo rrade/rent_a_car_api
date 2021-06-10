@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\ClientController;
 use App\Http\Controllers\API\CountryController;
 use App\Http\Controllers\API\LocationController;
 use App\Http\Controllers\API\PhotoController;
@@ -73,6 +74,8 @@ Route::group([
     Route::get('countries', [CountryController::class,'index']);
     //Locations
     Route::get('locations', [LocationController::class,'index']);
+    //Clients
+    Route::get('clients', [ClientController::class,'index']);
 });
 
 
