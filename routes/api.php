@@ -6,6 +6,7 @@ use App\Http\Controllers\API\ClientController;
 use App\Http\Controllers\API\CountryController;
 use App\Http\Controllers\API\LocationController;
 use App\Http\Controllers\API\PhotoController;
+use App\Http\Controllers\API\EquipmentController;
 use App\Http\Controllers\API\ReservationController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\VehicleController;
@@ -79,6 +80,8 @@ Route::group([
     Route::get('clients', [ClientController::class,'index']);
     //Car types
     Route::get('car-types',[CarTypeController::class,'index']);
+    //Car types
+    Route::get('equipment',[EquipmentController::class,'index']);
 });
 
 
