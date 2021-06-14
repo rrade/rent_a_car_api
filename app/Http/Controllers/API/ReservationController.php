@@ -32,6 +32,7 @@ class ReservationController extends Controller
             'vehicle' => function($query){
                 $query->with('carType');
             },
+            'equipment',
             'client'
         ]);
         if (auth()->user()->role_id == Role::USER){
@@ -53,6 +54,7 @@ class ReservationController extends Controller
 
     public function store(ReservationRequest $request)
     {
+        //dd($request->except('equipment'));
        // $reservation = Reservation::query()->create($request->validated());
         // make the date format right for using Carbon
 
@@ -70,8 +72,18 @@ class ReservationController extends Controller
         // calculate the price of reservation using the price of the chosen vehicle
         $price = $diff_in_days * Vehicle::find($request->vehicle_id)->price_per_day;
         $request->total_price = $price;
-        $data = array_merge($request->validated(), ['total_price' => $price]);
+        $data = array_merge($request->except('equipment'), ['total_price' => $price]);
         $reservation = Reservation::query()->create($data);
+
+        foreach ($request->equipment as $item){
+            EquipmentReservation::query()->create([
+                 'equipment_id'=>$item['equipment_id'],
+                 'reservation_id'=>$reservation->id,
+                 'quantity'=>$item['quantity']
+            ]);
+        }
+
+        $reservation = Reservation::query()->find($reservation->id);
 
         return response()->json($reservation,200);
 
@@ -91,6 +103,7 @@ class ReservationController extends Controller
             'vehicle' => function($query){
                 $query->with('carType');
             },
+            'equipment',
             'client'
         ]);
 
@@ -102,6 +115,7 @@ class ReservationController extends Controller
     public function update(ReservationRequest $request, $id)
     {
 
+        //dd(Vehicle::query()->find($request->vehicle_id)->isAvailable($request->from_date,$request->to_date,$id));
         abort_unless(Vehicle::query()->find($request->vehicle_id)->isAvailable($request->from_date,$request->to_date,$id),422,'Vehicle is unavaliable');
         $request->to_date .= ' 00:00:00';
         $request->from_date .= ' 00:00:00';
@@ -114,8 +128,20 @@ class ReservationController extends Controller
         // calculate the price of reservation using the price of the chosen vehicle
         $price = $diff_in_days * Vehicle::find($request->vehicle_id)->price_per_day;
         $request->total_price = $price;
-        $data = array_merge($request->validated(), ['total_price' => $price]);
+        $data = array_merge($request->except('equipment'), ['total_price' => $price]);
         $reservation = Reservation::query()->where('id','=',$id)->update($data);
+
+        EquipmentReservation::query()->where('reservation_id' ,$id)->delete();
+
+        foreach ($request->equipment as $item){
+            EquipmentReservation::query()->create([
+                'equipment_id'=>$item['equipment_id'],
+                'reservation_id'=>$id,
+                'quantity'=>$item['quantity']
+            ]);
+        }
+
+        $reservation = Reservation::query()->find($id);
 
         return response()->json($reservation,200);
 

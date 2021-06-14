@@ -13,10 +13,13 @@ class Client extends Model
 
     protected $guarded = [];
 
-    protected $with = ['country'];
+    protected $with = ['country','user'];
 
     public function country() {
         return $this->belongsTo(Country::class);
+    }
+    public function user() {
+        return $this->hasOne(User::class,'client_id');
     }
 
 }

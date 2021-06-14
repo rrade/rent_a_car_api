@@ -43,12 +43,14 @@ class Vehicle extends Model
 
     public function isAvailable($start_date,$end_date,$id = null)
     {
-      return Reservation::query()->whereBetween('from_date', [$start_date, $end_date])
-          ->orWhereBetween('to_date', [$start_date, $end_date])
-          ->orWhereRaw('? BETWEEN from_date and to_date', [$start_date])
-          ->orWhereRaw('? BETWEEN from_date and to_date', [$end_date])->where('vehicle_id',$this->id)->when($id,function ($query) use ($id){
+        return Reservation::query()->where(function($query) use ($start_date,$end_date){
+          $query->whereBetween('from_date', [$start_date, $end_date])
+              ->orWhereBetween('to_date', [$start_date, $end_date])
+              ->orWhereRaw('? BETWEEN from_date and to_date', [$start_date])
+              ->orWhereRaw('? BETWEEN from_date and to_date', [$end_date]);
+      })->where('vehicle_id',$this->id)->when($id,function ($query) use ($id){
               $query->where('reservations.id','!=',$id);
-              })->count() == 0;
+              })->count()== 0;
 
     }
 

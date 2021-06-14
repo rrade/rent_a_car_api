@@ -18,6 +18,7 @@ class Reservation extends Model
     const PER_PAGE = 10;
 
     protected $guarded = [];
+    protected $with = ['equipment'];
 
     public function vehicle() {
         return $this->belongsTo(Vehicle::class);
@@ -39,7 +40,7 @@ class Reservation extends Model
         return $this->belongsToMany(Equipment::class, 'equipment_reservations', 'reservation_id', 'equipment_id')->withPivot(['quantity']);
     }
 
-    // function checks if reservation contains equipment based on equipment id 
+    // function checks if reservation contains equipment based on equipment id
     // returns quantity, which is used to give 'selected' property to correct items in the select menu
     public function reservationEquipmentQuantity($id){
         $query = EquipmentReservation::query()

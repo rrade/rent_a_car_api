@@ -3,6 +3,7 @@
 namespace App\Http\Requests\API;
 
 use App\Exceptions\ValidationException;
+use App\Rules\EquipmentQuantity;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -25,6 +26,7 @@ class ReservationRequest extends FormRequest
      */
     public function rules()
     {
+
         return [
             'vehicle_id' => 'required|exists:vehicles,id',
             'client_id' => 'required|exists:clients,id',
@@ -32,6 +34,10 @@ class ReservationRequest extends FormRequest
             'to_date' => 'required|date|after_or_equal:from_date',
             'rent_location_id' => 'required|exists:locations,id',
             'return_location_id' => 'required|exists:locations,id',
+            'equipment'=>'array',
+            'equipment.*.equipment_id' => 'int|exists:equipment,id',
+            'equipment.*.quantity' => ['int'],
+            'equipment.*' => new EquipmentQuantity()
         ];
     }
     protected function failedValidation(Validator $validator)
