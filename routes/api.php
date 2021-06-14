@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\CarTypeController;
 use App\Http\Controllers\API\ClientController;
 use App\Http\Controllers\API\CountryController;
 use App\Http\Controllers\API\LocationController;
@@ -76,6 +77,8 @@ Route::group([
     Route::get('locations', [LocationController::class,'index']);
     //Clients
     Route::get('clients', [ClientController::class,'index']);
+    //Car types
+    Route::get('car-types',[CarTypeController::class,'index']);
 });
 
 
