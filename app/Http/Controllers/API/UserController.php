@@ -5,10 +5,13 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\API\UserRequest;
 use App\Models\Client;
+use App\Models\EquipmentReservation;
+use App\Models\Reservation;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -106,11 +109,28 @@ class UserController extends Controller
         if (auth()->user()->role_id == Role::USER){
             return response()->json(['message'=>'Unauthorised!'],403);
         }
+        DB::beginTransaction();
         $user = User::query()->where('id',$id);
         $user_get =$user->first();
         $user_get = $user_get->client_id;
-        $user->delete();
-        Client::query()->where('id',$user_get)->delete();
+        try {
+            $reservation = Reservation::query()->where('client_id', $user_get);
+            $reservation_get = $reservation->first();
+            if ($reservation_get) {
+
+                if (EquipmentReservation::query()->where('reservation_id', $reservation_get->id)->first()) {
+                    EquipmentReservation::query()->where('reservation_id', $reservation_get->id)->delete();
+                }
+
+                $reservation->delete();
+            }
+            $user->delete();
+            Client::query()->where('id', $user_get)->delete();
+            DB::commit();
+        } catch (Exception $e) {
+        DB::rollBack();
+
+        }
         return response()->json(['message'=>'Success!'],200);
 
     }

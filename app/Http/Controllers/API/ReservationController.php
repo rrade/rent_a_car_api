@@ -9,6 +9,8 @@ use App\Models\EquipmentReservation;
 use App\Models\Reservation;
 use App\Models\Role;
 use App\Models\Vehicle;
+use Carbon\Carbon;
+use App\Models\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -74,14 +76,25 @@ class ReservationController extends Controller
         $request->total_price = $price;
         $data = array_merge($request->except('equipment'), ['total_price' => $price]);
         $reservation = Reservation::query()->create($data);
+        $client = Client::query()->where('id',$request->client_id)->first();
+        if($client->date_of_first_reservation == NULL || $client->date_of_first_reservation > $from){
+            $client->update(['date_of_first_reservation'=>$from]);
+        }
+        if ($client->date_of_last_reservation == NULL || $client->date_of_last_reservation < $to){
+            $client->update(['date_of_last_reservation'=>$from]);
+        }
 
+        $q = 0;
         foreach ($request->equipment as $item){
+            $q += $item['quantity'] * 5;
             EquipmentReservation::query()->create([
                  'equipment_id'=>$item['equipment_id'],
                  'reservation_id'=>$reservation->id,
                  'quantity'=>$item['quantity']
             ]);
         }
+        $total = $price + $q;
+        $reservation->update(['total_price'=>$total]);
 
         $reservation = Reservation::query()->find($reservation->id);
 
@@ -131,17 +144,31 @@ class ReservationController extends Controller
         $data = array_merge($request->except('equipment'), ['total_price' => $price]);
         $reservation = Reservation::query()->where('id','=',$id)->update($data);
 
+        $client = Client::query()->where('id',$request->client_id)->first();
+
+        if ($client->date_of_first_reservation > $from){
+            $client->update(['date_of_first_reservation'=>$from]);
+        }
+        if ($client->date_of_last_reservation > $from){
+            $client->update(['date_of_last_reservation'=>$to]);
+        }
+
         EquipmentReservation::query()->where('reservation_id' ,$id)->delete();
 
+        $q=0;
         foreach ($request->equipment as $item){
+            $q += $item['quantity'] * 5;
             EquipmentReservation::query()->create([
                 'equipment_id'=>$item['equipment_id'],
                 'reservation_id'=>$id,
                 'quantity'=>$item['quantity']
             ]);
         }
+        $total = $price + $q;
+
 
         $reservation = Reservation::query()->find($id);
+        $reservation->update(['total_price'=>$total]);
 
         return response()->json($reservation,200);
 

@@ -30,6 +30,7 @@ class UserRequest extends FormRequest
         $rules =  [
             'name' => 'required|string|max:255',
             'country_id' => 'required|exists:countries,id',
+            'remarks' => 'nullable|string|max:1000',
         ];
         if($name == 'user-store'){
             $rules += ['email' => 'required|email|unique:clients,email|unique:users,email',
